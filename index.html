@@ -1,0 +1,879 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=1.0, user-scalable=no">
+    <title>The Haven — For Dahlia's Dearest</title>
+    <style>
+        :root {
+            --cherry-red: #8B0000;
+            --navy-blue: #0B132B;
+            --gold: #D4AF37;
+            --deep-space: #010205;
+            --gothic-dark: #04060b;
+        }
+
+        * {
+            box-sizing: border-box;
+            margin: 0;
+            padding: 0;
+            font-family: 'Cinzel', 'Georgia', serif;
+            user-select: none;
+        }
+
+        body, html {
+            width: 100vw;
+            height: 100vh;
+            overflow: hidden;
+            background-color: var(--deep-space);
+            color: #f1f5f9;
+        }
+
+        /* Cinematic Full-Screen Viewport Stages */
+        .cinema-stage {
+            position: fixed;
+            top: 0; left: 0; width: 100vw; height: 100vh;
+            display: flex;
+            justify-content: center;
+            align-items: center;
+            opacity: 0;
+            pointer-events: none;
+            transition: opacity 2s cubic-bezier(0.4, 0, 0.2, 1);
+            z-index: 10;
+        }
+
+        .cinema-stage.active {
+            opacity: 1;
+            pointer-events: auto;
+        }
+
+        /* Upgraded Gothic-Tech Gateway Intro */
+        #audio-shield {
+            background: linear-gradient(135deg, #010205 0%, #070913 50%, #0B132B 100%);
+            z-index: 9999;
+            flex-direction: column;
+            text-align: center;
+            opacity: 1;
+            pointer-events: auto;
+            border: 1px solid rgba(214, 175, 87, 0.15);
+            padding: 20px;
+        }
+
+        .gateway-card {
+            background: rgba(4, 6, 12, 0.9);
+            border: 1px solid var(--gold);
+            padding: 40px 20px;
+            box-shadow: 0 0 50px rgba(0,0,0,0.9), inset 0 0 20px rgba(214, 175, 87, 0.1);
+            display: flex;
+            flex-direction: column;
+            align-items: center;
+            width: 100%;
+            max-width: 450px;
+        }
+
+        #audio-shield button {
+            background: transparent;
+            border: 1px solid var(--gold);
+            color: var(--gold);
+            padding: 16px 30px;
+            font-size: 0.95rem;
+            cursor: pointer;
+            letter-spacing: 4px;
+            text-transform: uppercase;
+            transition: all 0.4s ease;
+            margin-top: 25px;
+        }
+
+        #audio-shield button:hover {
+            background: var(--gold);
+            color: black;
+            box-shadow: 0 0 30px rgba(214, 175, 87, 0.5);
+        }
+
+        /* Stage 1 & 2 Typography */
+        #summoning-text {
+            font-size: 2.2rem;
+            color: #b91c1c;
+            text-shadow: 0 0 20px rgba(185, 28, 28, 0.6), 2px 2px 5px #000;
+            font-weight: 700;
+            letter-spacing: 6px;
+            text-align: center;
+            padding: 20px;
+        }
+
+        .envelope-container {
+            perspective: 1500px;
+            cursor: pointer;
+            width: 90%;
+            max-width: 420px;
+        }
+
+        .envelope {
+            position: relative;
+            width: 100%;
+            height: 260px;
+            background: var(--navy-blue);
+            border: 1px solid var(--gold);
+            box-shadow: 0 20px 60px rgba(0,0,0,0.95);
+            transform-style: preserve-3d;
+            transition: transform 1.8s ease;
+        }
+
+        .envelope::before {
+            content: '';
+            position: absolute;
+            top: 0; left: 0; width: 0; height: 0;
+            border-left: 210px solid transparent;
+            border-right: 210px solid transparent;
+            border-top: 130px solid rgba(214, 175, 87, 0.25);
+            transform-origin: top;
+            transition: transform 1.5s ease 0.3s;
+            z-index: 3;
+        }
+
+        .envelope.open::before {
+            transform: rotateX(180deg);
+        }
+
+        .envelope-text {
+            position: absolute;
+            width: 100%; height: 100%;
+            display: flex;
+            flex-direction: column;
+            justify-content: center;
+            align-items: center;
+            color: var(--gold);
+            font-size: 1rem;
+            letter-spacing: 3px;
+            text-align: center;
+            padding: 20px;
+        }
+
+        #letter-reveal {
+            background: rgba(1, 2, 5, 0.98);
+            flex-direction: column;
+            padding: 30px;
+            text-align: center;
+        }
+
+        .romantic-font {
+            font-style: italic;
+            font-size: 1.6rem;
+            color: #f1f5f9;
+            line-height: 1.8;
+            max-width: 800px;
+            letter-spacing: 1px;
+        }
+
+        /* Blackhole Simulation Canvas */
+        #blackhole-canvas {
+            position: absolute;
+            top: 0; left: 0; width: 100vw; height: 100vh;
+            z-index: 1;
+        }
+
+        .terminal-container {
+            position: relative;
+            z-index: 2;
+            text-align: center;
+            max-width: 90vw;
+            padding: 20px;
+        }
+
+        .typing-box {
+            font-size: 1.2rem;
+            color: var(--gold);
+            letter-spacing: 2px;
+            min-height: 60px;
+            line-height: 1.6;
+            font-family: 'Courier New', monospace;
+        }
+
+        .husky-voice {
+            font-size: 1.4rem;
+            color: #cbd5e1;
+            margin-top: 25px;
+            opacity: 0;
+            transform: translateY(20px);
+            transition: all 3s cubic-bezier(0.4, 0, 0.2, 1);
+            font-style: italic;
+        }
+
+        /* Photo Gallery Frames */
+        .photo-frame {
+            position: absolute;
+            width: 100vw; height: 100vh;
+            object-fit: cover;
+            opacity: 0;
+            transition: opacity 3s cubic-bezier(0.4, 0, 0.2, 1);
+            filter: brightness(0.6) contrast(1.2);
+        }
+        .photo-frame.visible { opacity: 1; }
+
+        /* Thunderstorm & Poem Stage */
+        #stage-poem { background: #010206; overflow-y: auto; padding: 20px; }
+        .poem-container {
+            position: relative;
+            z-index: 5;
+            width: 100%;
+            max-width: 700px;
+            text-align: center;
+            opacity: 0;
+            transform: translateY(30px);
+            transition: all 3s ease;
+            padding: 30px 20px;
+            background: rgba(4, 6, 12, 0.92);
+            border: 1px solid rgba(214, 175, 87, 0.2);
+            margin: auto;
+        }
+        .poem-title { color: var(--gold); font-size: 1.8rem; margin-bottom: 5px; letter-spacing: 4px; text-transform: uppercase; }
+        .poem-subtitle { color: #64748b; font-size: 0.85rem; letter-spacing: 3px; margin-bottom: 20px; text-transform: uppercase; }
+        .poem-body { font-size: 1.05rem; line-height: 2; color: #e2e8f0; font-style: italic; text-align: center; }
+        .cinematic-link {
+            display: inline-block;
+            margin-top: 25px;
+            color: var(--gold);
+            text-decoration: none;
+            font-size: 0.9rem;
+            letter-spacing: 3px;
+            text-transform: uppercase;
+            border-bottom: 1px solid var(--gold);
+            padding-bottom: 4px;
+            cursor: pointer;
+        }
+
+        /* Official Website Realms Architecture */
+        .webpage-realm {
+            position: fixed;
+            top: 0; left: 0; width: 100vw; height: 100vh;
+            display: none;
+            z-index: 50;
+            flex-direction: column;
+            background: var(--gothic-dark);
+        }
+        .webpage-realm.active-world { display: flex; }
+
+        /* Top Official Navbar */
+        .official-header {
+            width: 100%;
+            height: 60px;
+            background: rgba(2, 3, 7, 0.98);
+            border-bottom: 1px solid rgba(214, 175, 87, 0.18);
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+            padding: 0 15px;
+            z-index: 100;
+        }
+        .brand-title {
+            color: var(--gold);
+            font-size: 0.95rem;
+            letter-spacing: 2px;
+            text-transform: uppercase;
+        }
+        .realm-tabs {
+            display: flex;
+            gap: 12px;
+        }
+        .realm-tab-btn {
+            background: transparent;
+            border: none;
+            color: #64748b;
+            font-size: 0.75rem;
+            letter-spacing: 1px;
+            text-transform: uppercase;
+            cursor: pointer;
+            padding-bottom: 3px;
+            border-bottom: 2px solid transparent;
+        }
+        .realm-tab-btn.active { color: var(--gold); border-color: var(--gold); }
+        .exit-btn { color: #dc2626; }
+
+        .realm-body {
+            flex: 1;
+            position: relative;
+            overflow-y: auto;
+            padding: 20px;
+            display: flex;
+            justify-content: center;
+            align-items: center;
+        }
+
+        /* 1. UNKNOWN REALM */
+        #world-unknown { background: #000000; }
+        .diary-mainframe {
+            width: 100%; max-width: 800px;
+            background: rgba(4, 5, 10, 0.92);
+            border: 1px solid rgba(214, 175, 87, 0.2);
+            padding: 25px;
+            display: flex; flex-direction: column; gap: 20px;
+        }
+        .diary-mainframe h2 {
+            color: var(--gold); font-size: 1.3rem; letter-spacing: 2px; text-align: center; text-transform: uppercase; font-weight: normal;
+        }
+        .diary-mainframe textarea {
+            width: 100%; height: 250px;
+            background: rgba(0,0,0,0.85);
+            border: 1px solid rgba(214,175,87,0.15);
+            color: #f1f5f9; padding: 15px; font-size: 1rem; line-height: 1.6; font-family: 'Georgia', serif; resize: none; outline: none;
+        }
+        .hud-btn {
+            background: transparent; border: 1px solid var(--gold); color: var(--gold);
+            padding: 10px 20px; font-size: 0.75rem; letter-spacing: 2px; cursor: pointer; text-transform: uppercase; align-self: center;
+        }
+
+        /* 2. REALITY REALM */
+        #world-reality { background: #020409; }
+        .reality-grid {
+            width: 100%; max-width: 1200px; height: 100%;
+            display: flex; flex-direction: column; gap: 15px;
+        }
+        .oracle-box {
+            flex: 1;
+            background: rgba(2, 4, 10, 0.9);
+            border: 1px solid rgba(255,255,255,0.06);
+            padding: 15px; display: flex; flex-direction: column;
+        }
+        .chat-screen {
+            flex: 1; overflow-y: auto; margin-bottom: 10px; display: flex; flex-direction: column; gap: 12px;
+        }
+        .chat-msg { max-width: 90%; padding: 12px; font-size: 0.9rem; line-height: 1.5; }
+        .chat-user { background: rgba(214,175,87,0.06); border: 1px solid var(--gold); align-self: flex-end; color: #fff; font-family: 'Courier New', monospace; }
+        .chat-ai { background: rgba(255,255,255,0.02); border: 1px solid rgba(255,255,255,0.08); align-self: flex-start; color: #cbd5e1; font-family: 'Courier New', monospace; }
+        .chat-input-row { display: flex; gap: 10px; }
+        .chat-input-row input {
+            flex: 1; background: rgba(0,0,0,0.8); border: 1px solid rgba(255,255,255,0.12); padding: 12px; color: white; font-size: 0.9rem; outline: none; font-family: 'Courier New', monospace;
+        }
+        .vault-panel { display: none; } /* Hidden on mobile for spacing cleanliness, visible on desktop */
+
+        /* 3. YOUR WORLD REALM */
+        #world-lexicon { background: #04060f; }
+        .lexicon-mainframe {
+            width: 100%; max-width: 1400px; height: 100%;
+            display: flex; flex-direction: column; gap: 20px; overflow-y: auto; padding-bottom: 30px;
+        }
+        .lexicon-controls {
+            background: rgba(2, 3, 8, 0.92); border: 1px solid rgba(255,255,255,0.05); padding: 20px; display: flex; flex-direction: column; gap: 12px;
+        }
+        .control-group label { display: block; color: var(--gold); font-size: 0.7rem; letter-spacing: 1px; text-transform: uppercase; margin-bottom: 4px; }
+        .control-group select, .control-group input {
+            width: 100%; background: #070a14; border: 1px solid rgba(255,255,255,0.1); color: white; padding: 10px; font-size: 0.9rem; outline: none;
+        }
+        .lexicon-results-stream {
+            background: rgba(2, 3, 8, 0.95); border: 1px solid rgba(214,175,87,0.12); padding: 20px; display: flex; flex-direction: column; gap: 20px;
+        }
+        .lexicon-word-card {
+            border-bottom: 1px solid rgba(255,255,255,0.05); padding-bottom: 20px; display: flex; flex-direction: column; gap: 10px;
+        }
+        .lexicon-thumb { width: 100%; height: 140px; object-fit: cover; border: 1px solid var(--gold); }
+        .lexicon-info h4 { color: var(--gold); font-size: 1.2rem; letter-spacing: 1px; }
+        .lexicon-info .pos { font-size: 0.75rem; color: #64748b; font-style: italic; }
+        .lexicon-info p { font-size: 0.95rem; line-height: 1.5; color: #cbd5e1; }
+        .verse-section {
+            background: rgba(2, 3, 8, 0.95); border: 1px solid rgba(214,175,87,0.12); padding: 20px; display: flex; flex-direction: column; gap: 15px;
+        }
+        .verse-box {
+            background: rgba(255,255,255,0.02); border: 1px solid rgba(255,255,255,0.05); padding: 15px; font-size: 0.95rem; line-height: 1.6; color: #f1f5f9; font-style: italic;
+        }
+
+        @media(min-width: 900px) {
+            .lexicon-mainframe { display: grid; grid-template-columns: 320px 1fr 350px; height: 88vh; }
+            .lexicon-thumb { width: 120px; height: 90px; }
+            .lexicon-word-card { display: grid; grid-template-columns: 120px 1fr; gap: 15px; }
+            .vault-panel { display: flex; }
+        }
+    </style>
+</head>
+<body>
+
+    <!-- GOTHIC-TECH GATEWAY INTRO -->
+    <div id="audio-shield" class="cinema-stage active">
+        <div class="gateway-card">
+            <h1 style="font-size: 2rem; color: var(--gold); letter-spacing: 6px; margin-bottom: 10px; text-transform: uppercase;">The Haven</h1>
+            <p style="color: #64748b; font-size: 0.75rem; letter-spacing: 3px; margin-bottom: 5px; text-transform: uppercase; font-family: 'Courier New', monospace;">Secure Node // Dahlia's Dearest</p>
+            <button onclick="startTheatricalExperience()">Initialize Terminal</button>
+        </div>
+    </div>
+
+    <!-- STAGE 1: PRELUDE -->
+    <div id="stage-prelude" class="cinema-stage">
+        <div id="summoning-text">WE'VE BEEN WAITING FOR YOU...</div>
+    </div>
+
+    <!-- STAGE 2: ENVELOPE -->
+    <div id="stage-envelope" class="cinema-stage">
+        <div class="envelope-container" onclick="openRoyalScroll()">
+            <div id="envelope-hardware" class="envelope">
+                <div class="envelope-text">ROYAL DECREE<br><span style="font-size: 0.75rem; margin-top: 8px; display: block; color: #64748b;">To Her Highness, Dahlia's Dearest</span></div>
+            </div>
+        </div>
+    </div>
+
+    <!-- STAGE 2.5: LETTER REVEAL -->
+    <div id="letter-reveal" class="cinema-stage">
+        <p id="decree-narrative-frame" class="romantic-font">“Here you enter the haven your Dahlia created for you.”</p>
+    </div>
+
+    <!-- STAGE 3: BLACKHOLE SIMULATION -->
+    <div id="stage-cosmic" class="cinema-stage">
+        <canvas id="blackhole-canvas"></canvas>
+        <div class="terminal-container">
+            <div id="blackhole-terminal" class="typing-box"></div>
+            <div id="husky-vocal-track" class="husky-voice">“Here you enter the haven your Dahlia created for you.”</div>
+        </div>
+    </div>
+
+    <!-- STAGE 4: MEMORY GALLERY STREAM -->
+    <div id="stage-gallery" class="cinema-stage" style="background: #000;">
+        <img id="frame-1" class="photo-frame" src="https://images.unsplash.com/photo-1518709268805-4e9042af9f23?auto=format&fit=crop&w=1600&q=80" alt="Gothic Stained Glass">
+        <img id="frame-2" class="photo-frame" src="https://images.unsplash.com/photo-1509198397868-475647b2a1e5?auto=format&fit=crop&w=1600&q=80" alt="Starlit Canopy Forest">
+        <img id="frame-3" class="photo-frame" src="https://images.unsplash.com/photo-1534447677768-be436bb09401?auto=format&fit=crop&w=1600&q=80" alt="Storm Clouds & Light">
+    </div>
+
+    <!-- STAGE 5: THUNDERSTORM & POEM -->
+    <div id="stage-poem" class="cinema-stage">
+        <canvas id="canvas-rain" style="position: absolute; top:0; left:0; width:100vw; height:100vh; pointer-events:none; z-index:1;"></canvas>
+        <div id="elizabethan-poem-box" class="poem-container">
+            <h2 class="poem-title">An Ode to Her Grace</h2>
+            <div class="poem-subtitle">Composed for Dahlia's Dearest</div>
+            <div class="poem-body">
+                Shall I compare thee to the morning light,<br>
+                Whose gentle beam doth break the sleeping skies?<br>
+                Thou art more radiant to the waking sight,<br>
+                And softer grace shines deep within thine eyes.<br><br>
+                No artist’s brush could trace thy fair design,<br>
+                Nor golden thread depict thy gentle form;<br>
+                A quiet beauty, effortless, divine,<br>
+                A tranquil harbor in the sudden storm.<br><br>
+                Through every trial, thy perseverance stands,<br>
+                Unbroken by the tempest or the tide;<br>
+                A steadfast soul across the shifting sands,<br>
+                Where elegance and silent strength reside.<br><br>
+                Thy laughter breaks the darkest shadow’s shroud,<br>
+                A melody that lingers soft and clear;<br>
+                Exalted far above the restless crowd,<br>
+                A light to cherish and a heart held dear.<br><br>
+                Forever crowned in dignity and grace,<br>
+                Time bows before the sovereign of this place.
+            </div>
+            <a class="cinematic-link" onclick="enterMainWebpage()">Step Into The Realms</a>
+        </div>
+    </div>
+
+    <!-- REALM 1: UNKNOWN -->
+    <div id="world-unknown" class="webpage-realm">
+        <header class="official-header">
+            <div class="brand-title">The Haven — Void</div>
+            <div class="realm-tabs">
+                <button class="realm-tab-btn active" onclick="switchRealm('unknown')">Void</button>
+                <button class="realm-tab-btn" onclick="switchRealm('reality')">Axis</button>
+                <button class="realm-tab-btn" onclick="switchRealm('lexicon')">Lexicon</button>
+                <button class="realm-tab-btn exit-btn" onclick="exitHavenWebsite()">Exit</button>
+            </div>
+        </header>
+        <div class="realm-body">
+            <div class="diary-mainframe">
+                <h2>Inside Black Hole, You Create</h2>
+                <textarea id="diary-textarea" placeholder="Inscribe your secret diary entries or reflections here..."></textarea>
+                <button class="hud-btn" onclick="saveDiaryEntry()">Commit Entry to Vault</button>
+            </div>
+        </div>
+    </div>
+
+    <!-- REALM 2: REALITY -->
+    <div id="world-reality" class="webpage-realm">
+        <header class="official-header">
+            <div class="brand-title">The Haven — Axis</div>
+            <div class="realm-tabs">
+                <button class="realm-tab-btn" onclick="switchRealm('unknown')">Void</button>
+                <button class="realm-tab-btn active" onclick="switchRealm('reality')">Axis</button>
+                <button class="realm-tab-btn" onclick="switchRealm('lexicon')">Lexicon</button>
+                <button class="realm-tab-btn exit-btn" onclick="exitHavenWebsite()">Exit</button>
+            </div>
+        </header>
+        <div class="realm-body">
+            <div class="reality-grid">
+                <div class="oracle-box">
+                    <div id="oracle-stream" class="chat-screen">
+                        <div class="chat-msg chat-ai">Astrophysics Empirical Database Armed. Query cosmic phenomena or quantum mechanics. Non-scientific queries restricted.</div>
+                    </div>
+                    <div class="chat-input-row">
+                        <input id="oracle-input" type="text" placeholder="Query astrophysics..." onkeypress="if(event.key === 'Enter') queryOracleAI()">
+                        <button class="hud-btn" onclick="queryOracleAI()">Query</button>
+                    </div>
+                </div>
+            </div>
+        </div>
+    </div>
+
+    <!-- REALM 3: YOUR WORLD -->
+    <div id="world-lexicon" class="webpage-realm">
+        <header class="official-header">
+            <div class="brand-title">The Haven — Lexicon</div>
+            <div class="realm-tabs">
+                <button class="realm-tab-btn" onclick="switchRealm('unknown')">Void</button>
+                <button class="realm-tab-btn" onclick="switchRealm('reality')">Axis</button>
+                <button class="realm-tab-btn active" onclick="switchRealm('lexicon')">Lexicon</button>
+                <button class="realm-tab-btn exit-btn" onclick="exitHavenWebsite()">Exit</button>
+            </div>
+        </header>
+        <div class="realm-body">
+            <div class="lexicon-mainframe">
+                <div class="lexicon-controls">
+                    <div class="control-group">
+                        <label>Search Term</label>
+                        <input id="lex-query" type="text" placeholder="e.g., Solitude">
+                    </div>
+                    <div class="control-group">
+                        <label>Situation</label>
+                        <select id="lex-situation">
+                            <option>Deep intellectual contemplation</option>
+                            <option>Late night stargazing</option>
+                            <option>Writing an advanced essay</option>
+                        </select>
+                    </div>
+                    <div class="control-group">
+                        <label>Purpose</label>
+                        <select id="lex-purpose">
+                            <option>Linguistic mastery & expansion</option>
+                            <option>Poetic composition</option>
+                            <option>Academic precision</option>
+                        </select>
+                    </div>
+                    <button class="hud-btn" style="margin-top: 10px; width:100%;" onclick="executeLinguisticSearch()">Search (30 Results)</button>
+                </div>
+
+                <div id="lex-results-stream" class="lexicon-results-stream">
+                    <div style="margin: auto; text-align: center; color: #64748b; font-size: 0.95rem;">
+                        Enter parameters to generate 30 detailed lexical entries.
+                    </div>
+                </div>
+
+                <div class="verse-section">
+                    <h3 style="color: var(--gold); font-size: 0.9rem; letter-spacing: 2px; text-transform: uppercase; text-align: center;">AI Verse Generator</h3>
+                    <div class="control-group">
+                        <label>Current Mood / Rant</label>
+                        <input id="verse-rant" type="text" placeholder="Express your thoughts...">
+                    </div>
+                    <div style="display: flex; gap: 8px;">
+                        <button class="hud-btn" style="flex:1; font-size: 0.65rem; padding: 8px;" onclick="generatePoeticVerse('emotional')">Emotional</button>
+                        <button class="hud-btn" style="flex:1; font-size: 0.65rem; padding: 8px;" onclick="generatePoeticVerse('practical')">Practical</button>
+                    </div>
+                    <div id="generated-verse-display" class="verse-box" style="flex:1;">
+                        Generated verses will appear here...
+                    </div>
+                </div>
+            </div>
+        </div>
+    </div>
+
+    <script>
+        let audioCtx = null;
+        let masterGain = null;
+
+        function initAudioEngine() {
+            if (audioCtx) return;
+            audioCtx = new (window.AudioContext || window.webkitAudioContext)();
+            masterGain = audioCtx.createGain();
+            masterGain.gain.setValueAtTime(0.3, audioCtx.currentTime);
+            masterGain.connect(audioCtx.destination);
+        }
+
+        function playWednesdayOrchestralPrelude() {
+            if (!audioCtx) return;
+            let now = audioCtx.currentTime;
+            let chords = [110.00, 123.47, 146.83, 164.81];
+            chords.forEach((freq, i) => {
+                let osc = audioCtx.createOscillator();
+                let g = audioCtx.createGain();
+                osc.type = 'sawtooth';
+                osc.frequency.setValueAtTime(freq, now + (i * 0.3));
+                g.gain.setValueAtTime(0, now + (i * 0.3));
+                g.gain.linearRampToValueAtTime(0.15, now + 1 + (i * 0.3));
+                g.gain.exponentialRampToValueAtTime(0.0001, now + 5.0);
+                osc.connect(g);
+                g.connect(masterGain);
+                osc.start(now + (i * 0.3));
+                osc.stop(now + 5.2);
+            });
+        }
+
+        function playArpeggioChimes() {
+            if (!audioCtx) return;
+            let t = audioCtx.currentTime;
+            [523.25, 659.25, 783.99].forEach((p, idx) => {
+                let osc = audioCtx.createOscillator();
+                let g = audioCtx.createGain();
+                osc.type = 'sine';
+                osc.frequency.setValueAtTime(p, t + (idx * 0.08));
+                g.gain.setValueAtTime(0.1, t + (idx * 0.08));
+                g.gain.exponentialRampToValueAtTime(0.0001, t + (idx * 0.08) + 1);
+                osc.connect(g);
+                g.connect(masterGain);
+                osc.start(t + (idx * 0.08));
+                osc.stop(t + (idx * 0.08) + 1.2);
+            });
+        }
+
+        function playInterstellarOrganDrop() {
+            if (!audioCtx) return;
+            let t = audioCtx.currentTime;
+            let osc = audioCtx.createOscillator();
+            let g = audioCtx.createGain();
+            osc.type = 'sawtooth';
+            osc.frequency.setValueAtTime(28.5, t);
+            g.gain.setValueAtTime(0.001, t);
+            g.gain.linearRampToValueAtTime(0.4, t + 1);
+            g.gain.exponentialRampToValueAtTime(0.0001, t + 3.5);
+            osc.connect(g);
+            g.connect(masterGain);
+            osc.start(t);
+            osc.stop(t + 3.8);
+        }
+
+        function startTheatricalExperience() {
+            initAudioEngine();
+            if (audioCtx.state === 'suspended') { audioCtx.resume(); }
+            document.getElementById('audio-shield').classList.remove('active');
+            playWednesdayOrchestralPrelude();
+
+            setTimeout(() => {
+                document.getElementById('stage-prelude').classList.add('active');
+                setTimeout(() => {
+                    document.getElementById('stage-prelude').classList.remove('active');
+                    setTimeout(() => {
+                        document.getElementById('stage-envelope').classList.add('active');
+                    }, 800);
+                }, 4000);
+            }, 3500);
+        }
+
+        function openRoyalScroll() {
+            document.getElementById('envelope-hardware').classList.add('open');
+            playArpeggioChimes();
+            setTimeout(() => {
+                document.getElementById('stage-envelope').classList.remove('active');
+                let target = document.getElementById('letter-reveal');
+                target.classList.add('active');
+                setTimeout(() => {
+                    playInterstellarOrganDrop();
+                    target.classList.remove('active');
+                    runBlackholeSimulationStage();
+                }, 4500);
+            }, 1400);
+        }
+
+        let activeBlackhole = false;
+        function runBlackholeSimulationStage() {
+            document.getElementById('stage-cosmic').classList.add('active');
+            activeBlackhole = true;
+            renderRealisticBlackholeCanvas();
+
+            let terminalText = "Entered black hole, time travels slower. Journey begins...";
+            let box = document.getElementById('blackhole-terminal');
+            let idx = 0;
+            
+            function typeLoop() {
+                if (idx < terminalText.length) {
+                    box.innerHTML += terminalText.charAt(idx);
+                    idx++;
+                    setTimeout(typeLoop, 50);
+                } else {
+                    setTimeout(() => {
+                        document.getElementById('husky-vocal-track').style.opacity = 1;
+                        document.getElementById('husky-vocal-track').style.transform = "translateY(0)";
+                        setTimeout(() => {
+                            activeBlackhole = false;
+                            document.getElementById('stage-cosmic').classList.remove('active');
+                            startGalleryStream();
+                        }, 4000);
+                    }, 1000);
+                }
+            }
+            setTimeout(typeLoop, 500);
+        }
+
+        function renderRealisticBlackholeCanvas() {
+            const canvas = document.getElementById('blackhole-canvas');
+            const ctx = canvas.getContext('2d');
+            let w = canvas.width = window.innerWidth;
+            let h = canvas.height = window.innerHeight;
+
+            let particles = [];
+            for (let i = 0; i < 250; i++) {
+                particles.push({
+                    angle: Math.random() * Math.PI * 2,
+                    radius: Math.random() * w * 0.4 + 50,
+                    speed: Math.random() * 0.02 + 0.005,
+                    size: Math.random() * 2 + 1
+                });
+            }
+
+            function draw() {
+                if (!activeBlackhole) return;
+                ctx.fillStyle = 'rgba(1, 2, 5, 0.25)';
+                ctx.fillRect(0, 0, w, h);
+                let cx = w / 2, cy = h / 2;
+
+                particles.forEach(p => {
+                    p.angle += p.speed;
+                    p.radius -= 0.1;
+                    if (p.radius < 45) p.radius = Math.random() * w * 0.4 + 60;
+                    let x = cx + Math.cos(p.angle) * p.radius * 1.5;
+                    let y = cy + Math.sin(p.angle) * p.radius * 0.6;
+
+                    ctx.beginPath();
+                    ctx.arc(x, y, p.size, 0, Math.PI * 2);
+                    ctx.fillStyle = `rgba(255, 160, 30, 0.8)`;
+                    ctx.fill();
+                });
+
+                ctx.beginPath();
+                ctx.arc(cx, cy, 45, 0, Math.PI * 2);
+                ctx.fillStyle = '#000000';
+                ctx.fill();
+                ctx.strokeStyle = 'rgba(255, 180, 50, 0.8)';
+                ctx.lineWidth = 2;
+                ctx.stroke();
+
+                requestAnimationFrame(draw);
+            }
+            draw();
+        }
+
+        function startGalleryStream() {
+            document.getElementById('stage-gallery').classList.add('active');
+            let frames = [document.getElementById('frame-1'), document.getElementById('frame-2'), document.getElementById('frame-3')];
+            let ptr = 0;
+            function nextSlide() {
+                if (ptr < frames.length) {
+                    if (ptr > 0) frames[ptr-1].classList.remove('visible');
+                    frames[ptr].classList.add('visible');
+                    ptr++;
+                    setTimeout(nextSlide, 3500);
+                } else {
+                    frames[frames.length-1].classList.remove('visible');
+                    setTimeout(() => {
+                        document.getElementById('stage-gallery').classList.remove('active');
+                        runPoemStormStage();
+                    }, 800);
+                }
+            }
+            nextSlide();
+        }
+
+        let stormActive = false;
+        function runPoemStormStage() {
+            document.getElementById('stage-poem').classList.add('active');
+            stormActive = true;
+            initRainSimulation();
+            setTimeout(() => {
+                let box = document.getElementById('elizabethan-poem-box');
+                box.style.opacity = 1;
+                box.style.transform = "translateY(0)";
+            }, 1000);
+        }
+
+        function initRainSimulation() {
+            const canvas = document.getElementById('canvas-rain');
+            const ctx = canvas.getContext('2d');
+            let w = canvas.width = window.innerWidth;
+            let h = canvas.height = window.innerHeight;
+            let drops = [];
+            for (let i = 0; i < 150; i++) {
+                drops.push({x: Math.random()*w, y: Math.random()*h, len: Math.random()*20+10, v: Math.random()*12+10});
+            }
+            function loop() {
+                if (!stormActive) return;
+                ctx.clearRect(0,0,w,h);
+                ctx.strokeStyle = 'rgba(160, 180, 200, 0.3)';
+                ctx.lineWidth = 1;
+                drops.forEach(d => {
+                    ctx.beginPath();
+                    ctx.moveTo(d.x, d.y);
+                    ctx.lineTo(d.x, d.y + d.len);
+                    ctx.stroke();
+                    d.y += d.v;
+                    if (d.y > h) { d.y = -d.len; d.x = Math.random()*w; }
+                });
+                requestAnimationFrame(loop);
+            }
+            loop();
+        }
+
+        function enterMainWebpage() {
+            stormActive = false;
+            document.getElementById('stage-poem').classList.remove('active');
+            switchRealm('unknown');
+        }
+
+        function switchRealm(realmId) {
+            document.querySelectorAll('.webpage-realm').forEach(r => r.classList.remove('active-world'));
+            document.getElementById(`world-${realmId}`).classList.add('active-world');
+            playArpeggioChimes();
+        }
+
+        function exitHavenWebsite() {
+            window.close();
+            alert("The connection has been severed.");
+        }
+
+        function saveDiaryEntry() {
+            let val = document.getElementById('diary-textarea').value.trim();
+            if (!val) return alert("Write your reflection first.");
+            document.getElementById('diary-textarea').value = '';
+            alert("Diary entry committed to vault.");
+        }
+
+        const scienceDatabase = {
+            "quantum entanglement": "Two subatomic systems link such that the state of one dictates the other instantly.",
+            "event horizon": "The boundary surrounding a black hole where escape velocity exceeds light speed.",
+            "spacetime": "The four-dimensional continuum combining spatial dimensions and temporal progression."
+        };
+
+        function queryOracleAI() {
+            let input = document.getElementById('oracle-input');
+            let q = input.value.toLowerCase().trim();
+            if (!q) return;
+            let stream = document.getElementById('oracle-stream');
+            stream.innerHTML += `<div class="chat-msg chat-user">${input.value}</div>`;
+            let ans = "System Restriction: Calibrated for factual astrophysics data only.";
+            for (let key in scienceDatabase) {
+                if (q.includes(key)) { ans = scienceDatabase[key]; break; }
+            }
+            setTimeout(() => {
+                stream.innerHTML += `<div class="chat-msg chat-ai">${ans}</div>`;
+                stream.scrollTop = stream.scrollHeight;
+            }, 300);
+            input.value = '';
+        }
+
+        function executeLinguisticSearch() {
+            let term = document.getElementById('lex-query').value.trim() || "Aether";
+            let stream = document.getElementById('lex-results-stream');
+            stream.innerHTML = '';
+            for (let i = 1; i <= 30; i++) {
+                stream.innerHTML += `
+                    <div class="lexicon-word-card">
+                        <img class="lexicon-thumb" src="https://images.unsplash.com/photo-1518709268805-4e9042af9f23?auto=format&fit=crop&w=600&q=80" alt="Motif">
+                        <div class="lexicon-info">
+                            <h4>${term} — Variant ${i}</h4>
+                            <div class="pos">Etymology: Classical Antiquity Root</div>
+                            <p>Linguistic iteration tracking intellectual resonance and sublime presence.</p>
+                        </div>
+                    </div>`;
+            }
+        }
+
+        function generatePoeticVerse(type) {
+            let rant = document.getElementById('verse-rant').value.trim() || "Introspection";
+            let verseBox = document.getElementById('generated-verse-display');
+            let verses = {
+                emotional: `“Though shadows linger on the velvet stair, / Your spirit carries grace beyond compare.”`,
+                practical: `“Step forward with your resolute design, / For intellect is armor in the storm.”`
+            };
+            verseBox.innerHTML = `<strong>Mood: "${rant}"</strong><br><br>${verses[type]}`;
+        }
+    </script>
+</body>
+</html>
